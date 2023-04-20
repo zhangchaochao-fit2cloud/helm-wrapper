@@ -168,6 +168,25 @@ func updateRepos(c *gin.Context) {
 	respOK(c, nil)
 }
 
+func addRepos(c *gin.Context) {
+	name := c.Query("name")
+	url := c.Query("url")
+	username := c.Query("username")
+	password := c.Query("password")
+	insecure := c.Query("insecure")
+	var repository = &repo.Entry{
+		Name:                  name,
+		URL:                   url,
+		Username:              username,
+		Password:              password,
+		InsecureSkipTLSverify: insecure == "true",
+	}
+	err := initRepos(repository)
+	if err != nil {
+		glog.Fatalln(err)
+	}
+}
+
 func listRepos(c *gin.Context) {
 	type repo struct {
 		Name string `json:"name"`

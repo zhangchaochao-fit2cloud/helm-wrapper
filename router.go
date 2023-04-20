@@ -45,6 +45,7 @@ func RegisterRouter(router *gin.Engine) {
 		repositories.GET("/charts", listRepoCharts)
 		// helm repo update
 		repositories.PUT("", updateRepos)
+		repositories.PUT("/add", addRepos)
 	}
 
 	// helm chart

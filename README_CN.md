@@ -6,10 +6,12 @@ Helm3 摒弃了 Helm2 的 Tiller 架构，使用纯命令行的方式执行相�
 
 * 如果某些API(release相关)需要支持多个集群，则可以使用以下参数
 
-| Params | Description |
-| :--- | :--- |
-| kube_context | 支持指定kube_context来区分不同集群 |
-| kube_config | 支持指定kube_config来区分不同集群 |
+| Params                    | Description             |
+|:--------------------------|:------------------------|
+| kube_context              | 支持指定kube_context来区分不同集群 |
+| kube_config               | 支持指定kube_config来区分不同集群  |
+| api_server & bearer_token | 支持指定api_server和bearer_token来区分不同集群  |
+
 
 helm 原生命令行和相关 API 对应关系：
 
