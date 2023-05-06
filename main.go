@@ -43,7 +43,7 @@ func main() {
 		glog.Fatalln(err)
 	}
 	pflag.CommandLine.StringVar(&listenHost, "addr", "0.0.0.0", "server listen addr")
-	pflag.CommandLine.StringVar(&listenPort, "port", "8080", "server listen port")
+	pflag.CommandLine.StringVar(&listenPort, "port", "5283", "server listen port")
 	pflag.CommandLine.StringVar(&config, "config", "config.yaml", "helm wrapper config")
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 	settings.AddFlags(pflag.CommandLine)

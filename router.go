@@ -8,24 +8,27 @@ import (
 )
 
 type respBody struct {
-	Code  int         `json:"code"` // 0 or 1, 0 is ok, 1 is error
-	Data  interface{} `json:"data,omitempty"`
-	Error string      `json:"error,omitempty"`
+	Code    int         `json:"code"` // 0 or 1, 0 is ok, 1 is error
+	Data    interface{} `json:"data,omitempty"`
+	Error   string      `json:"error,omitempty"`
+	Success bool        `json:"success"`
 }
 
 func respErr(c *gin.Context, err error) {
 	glog.Warningln(err)
 
 	c.JSON(http.StatusOK, &respBody{
-		Code:  1,
-		Error: err.Error(),
+		Code:    500,
+		Error:   err.Error(),
+		Success: false,
 	})
 }
 
 func respOK(c *gin.Context, data interface{}) {
 	c.JSON(http.StatusOK, &respBody{
-		Code: 0,
-		Data: data,
+		Code:    200,
+		Data:    data,
+		Success: true,
 	})
 }
 
@@ -45,7 +48,7 @@ func RegisterRouter(router *gin.Engine) {
 		repositories.GET("/charts", listRepoCharts)
 		// helm repo update
 		repositories.PUT("", updateRepos)
-		repositories.PUT("/add", addRepos)
+		repositories.POST("/add", addRepos)
 	}
 
 	// helm chart

@@ -2,3 +2,4 @@ uploadPath: /tmp/charts
 helmRepos:
   - name: bitnami
     url: https://charts.bitnami.com/bitnami
+    insecure_skip_tls_verify: true

@@ -137,15 +137,22 @@ func updateChart(c *repo.Entry) error {
 	return nil
 }
 
-func updateRepos(c *gin.Context) {
+func updateLocalRepos(c *gin.Context, aimChart string) {
 	type errRepo struct {
 		Name string
 		Err  string
 	}
-	errRepoList := []errRepo{}
+	var errRepoList []errRepo
+	var chatRepo string
+	if strings.Contains(aimChart, "/") {
+		chatRepo = strings.Split(aimChart, "/")[0]
+	}
 
 	var wg sync.WaitGroup
 	for _, c := range helmConfig.HelmRepos {
+		if chatRepo != "" && c.Name != chatRepo {
+			continue
+		}
 		wg.Add(1)
 		go func(c *repo.Entry) {
 			defer wg.Done()
@@ -164,26 +171,22 @@ func updateRepos(c *gin.Context) {
 		respErr(c, fmt.Errorf("error list: %v", errRepoList))
 		return
 	}
+}
 
+func updateRepos(c *gin.Context) {
+	updateLocalRepos(c, "")
 	respOK(c, nil)
 }
 
 func addRepos(c *gin.Context) {
-	name := c.Query("name")
-	url := c.Query("url")
-	username := c.Query("username")
-	password := c.Query("password")
-	insecure := c.Query("insecure")
-	var repository = &repo.Entry{
-		Name:                  name,
-		URL:                   url,
-		Username:              username,
-		Password:              password,
-		InsecureSkipTLSverify: insecure == "true",
+	var repository *repo.Entry
+	if err := c.ShouldBindJSON(&repository); err != nil {
+		respErr(c, err)
+		return
 	}
 	err := initRepos(repository)
 	if err != nil {
-		glog.Fatalln(err)
+		respErr(c, err)
 	}
 }
 

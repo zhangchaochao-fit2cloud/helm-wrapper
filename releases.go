@@ -52,20 +52,21 @@ type releaseElement struct {
 
 type releaseOptions struct {
 	// common
-	DryRun                   bool          `json:"dry_run"`
-	DisableHooks             bool          `json:"disable_hooks"`
-	Wait                     bool          `json:"wait"`
-	Devel                    bool          `json:"devel"`
-	Description              string        `json:"description"`
-	Atomic                   bool          `json:"atomic"`
-	SkipCRDs                 bool          `json:"skip_crds"`
-	SubNotes                 bool          `json:"sub_notes"`
-	Timeout                  time.Duration `json:"timeout"`
-	WaitForJobs              bool          `json:"wait_for_jobs"`
-	DisableOpenAPIValidation bool          `json:"disable_open_api_validation"`
-	Values                   string        `json:"values"`
-	SetValues                []string      `json:"set"`
-	SetStringValues          []string      `json:"set_string"`
+	DryRun                   bool                   `json:"dry_run"`
+	DisableHooks             bool                   `json:"disable_hooks"`
+	Wait                     bool                   `json:"wait"`
+	Devel                    bool                   `json:"devel"`
+	Description              string                 `json:"description"`
+	Atomic                   bool                   `json:"atomic"`
+	SkipCRDs                 bool                   `json:"skip_crds"`
+	SubNotes                 bool                   `json:"sub_notes"`
+	Timeout                  time.Duration          `json:"timeout"`
+	WaitForJobs              bool                   `json:"wait_for_jobs"`
+	DisableOpenAPIValidation bool                   `json:"disable_open_api_validation"`
+	Values                   string                 `json:"values"`
+	SetValues                []string               `json:"set"`
+	SetStringValues          []string               `json:"set_string"`
+	YamlValues               map[string]interface{} `json:"yaml_values"`
 	ChartPathOptions
 
 	// only install
@@ -142,11 +143,18 @@ func formatAppVersion(c *chart.Chart) string {
 
 func mergeValues(options releaseOptions) (map[string]interface{}, error) {
 	vals := map[string]interface{}{}
-	values, err := readValues(options.Values)
-	if err != nil {
-		return vals, err
+	var err error
+	if options.YamlValues != nil {
+		vals = options.YamlValues
+	} else {
+		var values []byte
+		values, err = readValues(options.Values)
+		if err != nil {
+			return vals, err
+		}
+		err = yaml.Unmarshal(values, &vals)
 	}
-	err = yaml.Unmarshal(values, &vals)
+
 	if err != nil {
 		return vals, fmt.Errorf("failed parsing values")
 	}
@@ -308,13 +316,16 @@ func installRelease(c *gin.Context) {
 	aimChart := c.Query("chart")
 	kubeContext := c.Query("kube_context")
 	kubeConfig := c.Query("kube_config")
-	apiServer := c.Query("api_server")
+	apiServer, _ := url.QueryUnescape(c.Query("api_server"))
 	bearerToken := c.Query("bearer_token")
 
 	if aimChart == "" {
 		respErr(c, fmt.Errorf("chart name can not be empty"))
 		return
 	}
+
+	// 先更新本地的 Helm 仓库，避免仓库找不到 Chart
+	updateLocalRepos(c, aimChart)
 
 	// install with local uploaded charts, *.tgz
 	splitChart := strings.Split(aimChart, ".")
