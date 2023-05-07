@@ -38,7 +38,7 @@ jobs:
       id: prepare
       run: |
         DOCKER_IMAGE=${{ vars.F2C_REGISTRY }}/north/helm-api
-        TAG_NAME=$GITHUB_REF##*/
+        TAG_NAME=$GITHUB_REF_NAME
         echo ::set-output name=docker_image::${DOCKER_IMAGE}
         echo ::set-output name=version::${TAG_NAME}
         echo ::set-output name=docker_image_tag::${DOCKER_IMAGE}:${TAG_NAME}
