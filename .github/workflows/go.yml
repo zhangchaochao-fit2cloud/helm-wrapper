@@ -47,8 +47,9 @@ jobs:
         export image=${{ steps.prepare.outputs.docker_image }}
         export branch=${{ steps.prepare.outputs.version }}
         make build-linux
-    - name: Build Image and push
-      uses: docker/build-push-action@v4
-      with:
-        push: true
-        tags: ${{ steps.prepare.outputs.docker_image_tag }}
+    - name: Set up Docker Buildx
+      uses: crazy-max/ghaction-docker-buildx@v3
+    - name: Docker Build (push)
+      run: |
+        docker build -t  ${{ steps.prepare.outputs.docker_image_tag }} .
+        docker push  ${{ steps.prepare.outputs.docker_image_tag }}
