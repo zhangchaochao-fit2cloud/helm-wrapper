@@ -37,7 +37,7 @@ jobs:
     - name: Prepare
       id: prepare
       run: |
-        DOCKER_IMAGE=${{ env.F2C_REGISTRY }}/north/helm-api
+        DOCKER_IMAGE=${{ vars.F2C_REGISTRY }}/north/helm-api
         TAG_NAME=${{ env.GITHUB_REF_SLUG }}
         echo ::set-output name=docker_image::${DOCKER_IMAGE}
         echo ::set-output name=version::${TAG_NAME}
