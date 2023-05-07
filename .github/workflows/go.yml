@@ -28,10 +28,10 @@ jobs:
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep ensure
         fi
-    - name: Login to ${{ env.F2C_REGISTRY }}
+    - name: Login to ${{ vars.F2C_REGISTRY }}
       uses: docker/login-action@v2
       with:
-        registry: ${{ env.F2C_REGISTRY }}
+        registry: ${{ vars.F2C_REGISTRY }}
         username: ${{ secrets.F2C_HARBOR_USER }}
         password: ${{ secrets.F2C_HARBOR_PASS }}
     - name: Prepare
