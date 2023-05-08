@@ -28,6 +28,8 @@ jobs:
         exclude:
           - goarch: arm64
             goos: windows
+          - goarch: arm64
+            goos: linux
     steps:
       - uses: actions/checkout@v3
       - uses: wangyoucao577/go-release-action@v1
